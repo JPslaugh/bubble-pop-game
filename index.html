@@ -1,0 +1,40 @@
+ <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,
+    user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <title>Bubble Pop - Mobile Game</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="gameContainer">
+            <div id="gameHeader">
+                <div id="scoreDisplay">Score: <span id="score">0</span></div>
+                <div id="levelDisplay">Level: <span id="level">1</span></div>
+                <div id="livesDisplay">Lives: <span id="lives">5</span></div>
+            </div>
+
+            <div id="gameArea">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <div id="gameOverScreen" class="hidden">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <button id="playAgainBtn">Play Again</button>
+            </div>
+
+            <div id="startScreen">
+                <h1>Bubble Pop</h1>
+                <p>Tap bubbles to pop them!</p>
+                <p>Don't let 5 bubbles escape!</p>
+                <button id="startBtn">Start Game</button>
+            </div>
+        </div>
+
+        <script src="game.js"></script>
+    </body>
+    </html>
