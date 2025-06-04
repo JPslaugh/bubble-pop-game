@@ -1,40 +1,269 @@
- <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0,
-    user-scalable=no">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="mobile-web-app-capable" content="yes">
-        <title>Bubble Pop - Mobile Game</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div id="gameContainer">
-            <div id="gameHeader">
-                <div id="scoreDisplay">Score: <span id="score">0</span></div>
-                <div id="levelDisplay">Level: <span id="level">1</span></div>
-                <div id="livesDisplay">Lives: <span id="lives">5</span></div>
-            </div>
+<!DOCTYPE html>
+     <html lang="en">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0,
+     user-scalable=no">
+         <title>Bubble Pop Game</title>
+         <style>
+             * {
+                 margin: 0;
+                 padding: 0;
+                 box-sizing: border-box;
+             }
 
-            <div id="gameArea">
-                <canvas id="gameCanvas"></canvas>
-            </div>
+             body {
+                 font-family: Arial, sans-serif;
+                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 height: 100vh;
+                 overflow: hidden;
+                 touch-action: none;
+             }
 
-            <div id="gameOverScreen" class="hidden">
-                <h2>Game Over!</h2>
-                <p>Final Score: <span id="finalScore">0</span></p>
-                <button id="playAgainBtn">Play Again</button>
-            </div>
+             #gameContainer {
+                 width: 100vw;
+                 height: 100vh;
+                 position: relative;
+             }
 
-            <div id="startScreen">
-                <h1>Bubble Pop</h1>
-                <p>Tap bubbles to pop them!</p>
-                <p>Don't let 5 bubbles escape!</p>
-                <button id="startBtn">Start Game</button>
-            </div>
-        </div>
+             #gameHeader {
+                 background: rgba(0, 0, 0, 0.3);
+                 padding: 10px 20px;
+                 color: white;
+                 display: flex;
+                 justify-content: space-between;
+                 font-weight: bold;
+             }
 
-        <script src="game.js"></script>
-    </body>
-    </html>
+             #gameCanvas {
+                 display: block;
+                 background: transparent;
+                 touch-action: none;
+             }
+
+             #startScreen, #gameOverScreen {
+                 position: absolute;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 background: rgba(0, 0, 0, 0.8);
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: center;
+                 align-items: center;
+                 color: white;
+                 text-align: center;
+             }
+
+             #startScreen.hidden, #gameOverScreen.hidden {
+                 display: none;
+             }
+
+             button {
+                 background: #4ECDC4;
+                 border: none;
+                 color: white;
+                 padding: 15px 30px;
+                 font-size: 18px;
+                 border-radius: 25px;
+                 cursor: pointer;
+                 margin: 10px;
+             }
+
+             button:active {
+                 background: #44A08D;
+             }
+
+             h1 { color: #FFD700; margin-bottom: 20px; }
+             h2 { color: #FF6B6B; margin-bottom: 20px; }
+         </style>
+     </head>
+     <body>
+         <div id="gameContainer">
+             <div id="gameHeader">
+                 <span>Score: <span id="score">0</span></span>
+                 <span>Level: <span id="level">1</span></span>
+                 <span>Lives: <span id="lives">5</span></span>
+             </div>
+
+             <canvas id="gameCanvas"></canvas>
+
+             <div id="startScreen">
+                 <h1>Bubble Pop</h1>
+                 <p>Tap bubbles to pop them!</p>
+                 <button id="startBtn">Start Game</button>
+             </div>
+
+             <div id="gameOverScreen" class="hidden">
+                 <h2>Game Over!</h2>
+                 <p>Score: <span id="finalScore">0</span></p>
+                 <button id="playAgainBtn">Play Again</button>
+             </div>
+         </div>
+
+         <script>
+             class BubbleGame {
+                 constructor() {
+                     this.canvas = document.getElementById('gameCanvas');
+                     this.ctx = this.canvas.getContext('2d');
+                     this.bubbles = [];
+                     this.score = 0;
+                     this.level = 1;
+                     this.lives = 5;
+                     this.gameRunning = false;
+                     this.spawnTimer = null;
+
+                     this.setupCanvas();
+                     this.setupEvents();
+                     this.animate();
+                 }
+
+                 setupCanvas() {
+                     this.canvas.width = window.innerWidth;
+                     this.canvas.height = window.innerHeight - 50;
+                 }
+
+                 setupEvents() {
+                     document.getElementById('startBtn').onclick = () =>
+     this.startGame();
+                     document.getElementById('playAgainBtn').onclick = () =>
+     this.resetGame();
+
+                     this.canvas.addEventListener('touchstart', (e) => {
+                         e.preventDefault();
+                         const touch = e.touches[0];
+                         const rect = this.canvas.getBoundingClientRect();
+                         this.handleClick(touch.clientX - rect.left,
+     touch.clientY - rect.top);
+                     });
+
+                     this.canvas.addEventListener('click', (e) => {
+                         const rect = this.canvas.getBoundingClientRect();
+                         this.handleClick(e.clientX - rect.left, e.clientY -
+     rect.top);
+                     });
+                 }
+
+                 startGame() {
+                     console.log('Game starting...');
+
+     document.getElementById('startScreen').classList.add('hidden');
+
+     document.getElementById('gameOverScreen').classList.add('hidden');
+                     this.gameRunning = true;
+                     this.spawnBubbles();
+                 }
+
+                 resetGame() {
+                     this.bubbles = [];
+                     this.score = 0;
+                     this.level = 1;
+                     this.lives = 5;
+                     this.gameRunning = false;
+                     if (this.spawnTimer) clearInterval(this.spawnTimer);
+                     this.updateUI();
+                     this.startGame();
+                 }
+
+                 spawnBubbles() {
+                     this.spawnTimer = setInterval(() => {
+                         if (this.bubbles.length < 6) {
+                             this.createBubble();
+                         }
+                     }, 2000);
+                     this.createBubble(); // spawn first bubble immediately
+                 }
+
+                 createBubble() {
+                     const size = 30 + Math.random() * 40;
+                     const bubble = {
+                         x: size + Math.random() * (this.canvas.width - size *
+     2),
+                         y: size + Math.random() * (this.canvas.height - size *
+      2),
+                         size: size,
+                         color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                         time: Date.now()
+                     };
+                     this.bubbles.push(bubble);
+                     console.log('Bubble created at', bubble.x, bubble.y);
+                 }
+
+                 handleClick(x, y) {
+                     if (!this.gameRunning) return;
+
+                     console.log('Click at', x, y);
+                     for (let i = this.bubbles.length - 1; i >= 0; i--) {
+                         const bubble = this.bubbles[i];
+                         const dist = Math.sqrt((x - bubble.x) ** 2 + (y -
+     bubble.y) ** 2);
+
+                         if (dist < bubble.size / 2) {
+                             this.bubbles.splice(i, 1);
+                             this.score += 10;
+                             this.updateUI();
+                             console.log('Bubble popped! Score:', this.score);
+                             break;
+                         }
+                     }
+                 }
+
+                 updateUI() {
+                     document.getElementById('score').textContent = this.score;
+                     document.getElementById('level').textContent = this.level;
+                     document.getElementById('lives').textContent = this.lives;
+                 }
+
+                 animate() {
+                     this.ctx.clearRect(0, 0, this.canvas.width,
+     this.canvas.height);
+
+                     if (this.gameRunning) {
+                         // Remove old bubbles
+                         const now = Date.now();
+                         this.bubbles = this.bubbles.filter(bubble => {
+                             if (now - bubble.time > 5000) {
+                                 this.lives--;
+                                 this.updateUI();
+                                 if (this.lives <= 0) {
+                                     this.endGame();
+                                 }
+                                 return false;
+                             }
+                             return true;
+                         });
+
+                         // Draw bubbles
+                         this.bubbles.forEach(bubble => {
+                             this.ctx.fillStyle = bubble.color;
+                             this.ctx.beginPath();
+                             this.ctx.arc(bubble.x, bubble.y, bubble.size / 2,
+     0, Math.PI * 2);
+                             this.ctx.fill();
+                             this.ctx.strokeStyle = 'white';
+                             this.ctx.lineWidth = 2;
+                             this.ctx.stroke();
+                         });
+                     }
+
+                     requestAnimationFrame(() => this.animate());
+                 }
+
+                 endGame() {
+                     this.gameRunning = false;
+                     if (this.spawnTimer) clearInterval(this.spawnTimer);
+                     document.getElementById('finalScore').textContent =
+     this.score;
+
+     document.getElementById('gameOverScreen').classList.remove('hidden');
+                 }
+             }
+
+             // Start the game when page loads
+             window.onload = () => {
+                 new BubbleGame();
+             };
+         </script>
+     </body>
+     </html>
