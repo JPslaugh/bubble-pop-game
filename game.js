@@ -23,16 +23,21 @@ class BubblePopGame {
             this.gameLoop();
         }
 
-        setupCanvas() {
-            const container = document.getElementById('gameArea');
-            this.canvas.width = container.clientWidth;
-            this.canvas.height = container.clientHeight;
+         setupCanvas() {
+      const container = document.getElementById('gameArea');
+      const rect = container.getBoundingClientRect();
+      this.canvas.width = Math.max(300, rect.width || window.innerWidth);
+      this.canvas.height = Math.max(400, rect.height || window.innerHeight -
+  100);
 
-            window.addEventListener('resize', () => {
-                this.canvas.width = container.clientWidth;
-                this.canvas.height = container.clientHeight;
-            });
-        }
+      window.addEventListener('resize', () => {
+          const newRect = container.getBoundingClientRect();
+          this.canvas.width = Math.max(300, newRect.width ||
+  window.innerWidth);
+          this.canvas.height = Math.max(400, newRect.height ||
+  window.innerHeight - 100);
+      });
+  }
 
         setupEventListeners() {
             document.getElementById('startBtn').addEventListener('click', ()
