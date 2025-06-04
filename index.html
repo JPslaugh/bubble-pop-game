@@ -214,17 +214,18 @@
               this.bubbles.splice(i, 1);
               this.score += 10;
 
-              // Level up every 50 points instead of every 500
-              const newLevel = Math.floor(this.score / 50) + 1;
+              // Level up every 20 points
+              const newLevel = Math.floor(this.score / 20) + 1;
               if (newLevel > this.level) {
+                  console.log('LEVELING UP! From', this.level, 'to',
+  newLevel);
                   this.level = newLevel;
                   if (this.spawnTimer) clearInterval(this.spawnTimer);
-                  this.spawnBubbles(); // Restart with faster rate
+                  this.spawnBubbles();
               }
 
               this.updateUI();
-              console.log('Bubble popped! Score:', this.score, 'Level:',
-  this.level);
+              console.log('Score:', this.score, 'Level:', this.level);
               break;
           }
       }
@@ -235,6 +236,7 @@
                      document.getElementById('score').textContent = this.score;
                      document.getElementById('level').textContent = this.level;
                      document.getElementById('lives').textContent = this.lives;
+                     console.log('UI Updated - Score:', this.score, 'Level:', this.level);
                  }
 
                  animate() {
