@@ -1,0 +1,188 @@
+* {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+     }
+
+     body {
+         font-family: 'Arial', sans-serif;
+         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+         height: 100vh;
+         overflow: hidden;
+         user-select: none;
+         -webkit-user-select: none;
+         -webkit-touch-callout: none;
+     }
+
+     #gameContainer {
+         width: 100vw;
+         height: 100vh;
+         display: flex;
+         flex-direction: column;
+         position: relative;
+     }
+
+     #gameHeader {
+         background: rgba(0, 0, 0, 0.3);
+         padding: 10px 20px;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         color: white;
+         font-weight: bold;
+         font-size: 16px;
+         z-index: 10;
+     }
+
+     #gameArea {
+         flex: 1;
+         position: relative;
+         overflow: hidden;
+     }
+
+     #gameCanvas {
+         width: 100%;
+         height: 100%;
+         display: block;
+         background: transparent;
+         touch-action: none;
+     }
+
+     #gameOverScreen, #startScreen {
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0, 0, 0, 0.8);
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: center;
+         color: white;
+         text-align: center;
+         z-index: 20;
+     }
+
+     #gameOverScreen.hidden, #startScreen.hidden {
+         display: none;
+     }
+
+     #startScreen h1 {
+         font-size: 3rem;
+         margin-bottom: 20px;
+         color: #FFD700;
+         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+     }
+
+     #gameOverScreen h2 {
+         font-size: 2.5rem;
+         margin-bottom: 20px;
+         color: #FF6B6B;
+         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+     }
+
+     #startScreen p, #gameOverScreen p {
+         font-size: 1.2rem;
+         margin-bottom: 15px;
+         opacity: 0.9;
+     }
+
+     #startBtn, #playAgainBtn {
+         background: linear-gradient(45deg, #4ECDC4, #44A08D);
+         border: none;
+         color: white;
+         padding: 15px 30px;
+         font-size: 1.2rem;
+         font-weight: bold;
+         border-radius: 25px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+         margin-top: 20px;
+     }
+
+     #startBtn:hover, #playAgainBtn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+     }
+
+     #startBtn:active, #playAgainBtn:active {
+         transform: translateY(0);
+         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+     }
+
+     @media (max-width: 480px) {
+         #gameHeader {
+             padding: 8px 15px;
+             font-size: 14px;
+         }
+
+         #startScreen h1 {
+             font-size: 2.5rem;
+         }
+
+         #gameOverScreen h2 {
+             font-size: 2rem;
+         }
+
+         #startScreen p, #gameOverScreen p {
+             font-size: 1rem;
+         }
+
+         #startBtn, #playAgainBtn {
+             padding: 12px 25px;
+             font-size: 1rem;
+         }
+     }
+
+     @media (max-height: 600px) {
+         #startScreen h1 {
+             font-size: 2rem;
+             margin-bottom: 15px;
+         }
+
+         #gameOverScreen h2 {
+             font-size: 1.8rem;
+             margin-bottom: 15px;
+         }
+
+         #startScreen p, #gameOverScreen p {
+             font-size: 0.9rem;
+             margin-bottom: 10px;
+         }
+
+         #startBtn, #playAgainBtn {
+             padding: 10px 20px;
+             font-size: 0.9rem;
+             margin-top: 15px;
+         }
+     }
+
+     @media (orientation: landscape) and (max-height: 500px) {
+         #gameHeader {
+             padding: 5px 15px;
+             font-size: 12px;
+         }
+
+         #startScreen h1 {
+             font-size: 1.8rem;
+             margin-bottom: 10px;
+         }
+
+         #gameOverScreen h2 {
+             font-size: 1.5rem;
+             margin-bottom: 10px;
+         }
+
+         #startScreen p, #gameOverScreen p {
+             font-size: 0.8rem;
+             margin-bottom: 8px;
+         }
+
+         #startBtn, #playAgainBtn {
+             padding: 8px 16px;
+             font-size: 0.8rem;
+             margin-top: 10px;
+         }
+     }
