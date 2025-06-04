@@ -167,13 +167,18 @@
                  }
 
                  spawnBubbles() {
-                     this.spawnTimer = setInterval(() => {
-                         if (this.bubbles.length < 6) {
-                             this.createBubble();
-                         }
-                     }, 2000);
-                     this.createBubble(); // spawn first bubble immediately
-                 }
+      const spawnRate = Math.max(200, 1500 - (this.level - 1) * 150); //
+  Starts at 1.5s, drops by 150ms per level
+      const maxBubbles = Math.min(15, 3 + this.level * 2); // Starts with 3,
+  adds 2 per level
+
+      this.spawnTimer = setInterval(() => {
+          if (this.bubbles.length < maxBubbles) {
+              this.createBubble();
+          }
+      }, spawnRate);
+      this.createBubble();
+  }
 
                  createBubble() {
                      const size = 30 + Math.random() * 40;
@@ -189,25 +194,34 @@
                      this.bubbles.push(bubble);
                      console.log('Bubble created at', bubble.x, bubble.y);
                  }
-
                  handleClick(x, y) {
-                     if (!this.gameRunning) return;
+      if (!this.gameRunning) return;
 
-                     console.log('Click at', x, y);
-                     for (let i = this.bubbles.length - 1; i >= 0; i--) {
-                         const bubble = this.bubbles[i];
-                         const dist = Math.sqrt((x - bubble.x) ** 2 + (y -
-     bubble.y) ** 2);
+      console.log('Click at', x, y);
+      for (let i = this.bubbles.length - 1; i >= 0; i--) {
+          const bubble = this.bubbles[i];
+          const dist = Math.sqrt((x - bubble.x) ** 2 + (y - bubble.y) ** 2);
 
-                         if (dist < bubble.size / 2) {
-                             this.bubbles.splice(i, 1);
-                             this.score += 10;
-                             this.updateUI();
-                             console.log('Bubble popped! Score:', this.score);
-                             break;
-                         }
-                     }
-                 }
+          if (dist < bubble.size / 2) {
+              this.bubbles.splice(i, 1);
+              this.score += 10;
+
+              // Level up every 50 points instead of every 500
+              const newLevel = Math.floor(this.score / 50) + 1;
+              if (newLevel > this.level) {
+                  this.level = newLevel;
+                  if (this.spawnTimer) clearInterval(this.spawnTimer);
+                  this.spawnBubbles(); // Restart with faster rate
+              }
+
+              this.updateUI();
+              console.log('Bubble popped! Score:', this.score, 'Level:',
+  this.level);
+              break;
+          }
+      }
+  }
+                
 
                  updateUI() {
                      document.getElementById('score').textContent = this.score;
