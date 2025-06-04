@@ -175,10 +175,10 @@
                  }
 
                  spawnBubbles() {
-      const spawnRate = Math.max(200, 1500 - (this.level - 1) * 150); //
-  Starts at 1.5s, drops by 150ms per level
-      const maxBubbles = Math.min(15, 3 + this.level * 2); // Starts with 3,
-  adds 2 per level
+      const spawnRate = Math.max(100, 1000 - (this.level - 1) * 100); //
+  Starts at 1s, drops by 100ms per level
+      const maxBubbles = Math.min(25, 3 + this.level * 3); // Starts with 3,
+  adds 3 per level, max 25
 
       this.spawnTimer = setInterval(() => {
           if (this.bubbles.length < maxBubbles) {
