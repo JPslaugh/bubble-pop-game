@@ -27,13 +27,20 @@
              }
 
              #gameHeader {
-                 background: rgba(0, 0, 0, 0.3);
-                 padding: 10px 20px;
-                 color: white;
-                 display: flex;
-                 justify-content: space-between;
-                 font-weight: bold;
-             }
+      background: rgba(0, 0, 0, 0.7);
+      padding: 8px 15px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 14px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      box-sizing: border-box;
+  }
 
              #gameCanvas {
                  display: block;
@@ -121,7 +128,8 @@
 
                  setupCanvas() {
                      this.canvas.width = window.innerWidth;
-                     this.canvas.height = window.innerHeight - 50;
+                     this.canvas.height = window.innerHeight - 40;
+                     this.canvas.style.marginTop = '40px';
                  }
 
                  setupEvents() {
