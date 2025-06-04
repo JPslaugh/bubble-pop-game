@@ -27,25 +27,26 @@
              }
 
              #gameHeader {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 8px 15px;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-      font-size: 14px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      box-sizing: border-box;
-  }
+                 background: rgba(0, 0, 0, 0.7);
+                 padding: 8px 15px;
+                 color: white;
+                 display: flex;
+                 justify-content: space-between;
+                 font-weight: bold;
+                 font-size: 14px;
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 right: 0;
+                 z-index: 100;
+                 box-sizing: border-box;
+             }
 
              #gameCanvas {
                  display: block;
                  background: transparent;
                  touch-action: none;
+                 margin-top: 40px;
              }
 
              #startScreen, #gameOverScreen {
@@ -61,6 +62,7 @@
                  align-items: center;
                  color: white;
                  text-align: center;
+                 z-index: 200;
              }
 
              #startScreen.hidden, #gameOverScreen.hidden {
@@ -84,6 +86,18 @@
 
              h1 { color: #FFD700; margin-bottom: 20px; }
              h2 { color: #FF6B6B; margin-bottom: 20px; }
+
+             #debugInfo {
+                 position: fixed;
+                 top: 50px;
+                 left: 10px;
+                 background: rgba(0,0,0,0.8);
+                 color: white;
+                 padding: 10px;
+                 font-size: 12px;
+                 z-index: 1000;
+                 border-radius: 5px;
+             }
          </style>
      </head>
      <body>
@@ -94,11 +108,14 @@
                  <span>Lives: <span id="lives">5</span></span>
              </div>
 
+             <div id="debugInfo">Ready to start...</div>
+
              <canvas id="gameCanvas"></canvas>
 
              <div id="startScreen">
                  <h1>Bubble Pop</h1>
                  <p>Tap bubbles to pop them!</p>
+                 <p>Gets crazy fast!</p>
                  <button id="startBtn">Start Game</button>
              </div>
 
@@ -124,12 +141,12 @@
                      this.setupCanvas();
                      this.setupEvents();
                      this.animate();
+                     this.updateDebug('Game initialized');
                  }
 
                  setupCanvas() {
                      this.canvas.width = window.innerWidth;
                      this.canvas.height = window.innerHeight - 40;
-                     this.canvas.style.marginTop = '40px';
                  }
 
                  setupEvents() {
@@ -154,7 +171,7 @@
                  }
 
                  startGame() {
-                     console.log('Game starting...');
+                     this.updateDebug('Game starting...');
 
      document.getElementById('startScreen').classList.add('hidden');
 
@@ -175,18 +192,20 @@
                  }
 
                  spawnBubbles() {
-      const spawnRate = Math.max(100, 1000 - (this.level - 1) * 100); //
-  Starts at 1s, drops by 100ms per level
-      const maxBubbles = Math.min(25, 3 + this.level * 3); // Starts with 3,
-  adds 3 per level, max 25
+                     const spawnRate = Math.max(100, 1000 - (this.level - 1) *
+     100);
+                     const maxBubbles = Math.min(25, 3 + this.level * 3);
 
-      this.spawnTimer = setInterval(() => {
-          if (this.bubbles.length < maxBubbles) {
-              this.createBubble();
-          }
-      }, spawnRate);
-      this.createBubble();
-  }
+                     this.updateDebug(`Level ${this.level}: Spawn every
+     ${spawnRate}ms, Max bubbles: ${maxBubbles}`);
+
+                     this.spawnTimer = setInterval(() => {
+                         if (this.bubbles.length < maxBubbles) {
+                             this.createBubble();
+                         }
+                     }, spawnRate);
+                     this.createBubble();
+                 }
 
                  createBubble() {
                      const size = 30 + Math.random() * 40;
@@ -200,43 +219,47 @@
                          time: Date.now()
                      };
                      this.bubbles.push(bubble);
-                     console.log('Bubble created at', bubble.x, bubble.y);
                  }
+
                  handleClick(x, y) {
-      if (!this.gameRunning) return;
+                     if (!this.gameRunning) return;
 
-      console.log('Click at', x, y);
-      for (let i = this.bubbles.length - 1; i >= 0; i--) {
-          const bubble = this.bubbles[i];
-          const dist = Math.sqrt((x - bubble.x) ** 2 + (y - bubble.y) ** 2);
+                     for (let i = this.bubbles.length - 1; i >= 0; i--) {
+                         const bubble = this.bubbles[i];
+                         const dist = Math.sqrt((x - bubble.x) ** 2 + (y -
+     bubble.y) ** 2);
 
-          if (dist < bubble.size / 2) {
-              this.bubbles.splice(i, 1);
-              this.score += 10;
+                         if (dist < bubble.size / 2) {
+                             this.bubbles.splice(i, 1);
+                             this.score += 10;
 
-              // Level up every 20 points
-              const newLevel = Math.floor(this.score / 20) + 1;
-              if (newLevel > this.level) {
-                  console.log('LEVELING UP! From', this.level, 'to',
-  newLevel);
-                  this.level = newLevel;
-                  if (this.spawnTimer) clearInterval(this.spawnTimer);
-                  this.spawnBubbles();
-              }
+                             const newLevel = Math.floor(this.score / 20) + 1;
+                             if (newLevel > this.level) {
+                                 this.level = newLevel;
+                                 this.updateDebug(`LEVEL UP! Now level
+     ${this.level}`);
+                                 if (this.spawnTimer)
+     clearInterval(this.spawnTimer);
+                                 this.spawnBubbles();
+                             }
 
-              this.updateUI();
-              console.log('Score:', this.score, 'Level:', this.level);
-              break;
-          }
-      }
-  }
-                
+                             this.updateUI();
+                             this.updateDebug(`Score: ${this.score}, Level:
+     ${this.level}, Bubbles: ${this.bubbles.length}`);
+                             break;
+                         }
+                     }
+                 }
 
                  updateUI() {
                      document.getElementById('score').textContent = this.score;
                      document.getElementById('level').textContent = this.level;
                      document.getElementById('lives').textContent = this.lives;
-                     console.log('UI Updated - Score:', this.score, 'Level:', this.level);
+                 }
+
+                 updateDebug(message) {
+                     document.getElementById('debugInfo').textContent =
+     message;
                  }
 
                  animate() {
@@ -244,10 +267,11 @@
      this.canvas.height);
 
                      if (this.gameRunning) {
-                         // Remove old bubbles
                          const now = Date.now();
                          this.bubbles = this.bubbles.filter(bubble => {
-                             if (now - bubble.time > 5000) {
+                             const lifetime = Math.max(1000, 4000 - (this.level
+      - 1) * 200);
+                             if (now - bubble.time > lifetime) {
                                  this.lives--;
                                  this.updateUI();
                                  if (this.lives <= 0) {
@@ -258,7 +282,6 @@
                              return true;
                          });
 
-                         // Draw bubbles
                          this.bubbles.forEach(bubble => {
                              this.ctx.fillStyle = bubble.color;
                              this.ctx.beginPath();
@@ -281,10 +304,10 @@
      this.score;
 
      document.getElementById('gameOverScreen').classList.remove('hidden');
+                     this.updateDebug(`Game Over! Final score: ${this.score}`);
                  }
              }
 
-             // Start the game when page loads
              window.onload = () => {
                  new BubbleGame();
              };
